@@ -1,33 +1,39 @@
 # TAIG Service Portal (TSP)
 
-Deployable foundation for the TAIG Service Portal — a web application for TAIG client-facing services, support, and portal capabilities.
+Production Artifact for the TAIG Service Portal — a public-facing web application for The AI Guy (TAIG) service operations.
 
 ## Project Purpose
 
-TSP is the central web platform for The AI Guy (TAIG) service operations. This repository provides the structural, operational, and deployment foundation upon which MVP features will be built in subsequent ACIs.
+TSP is the central web platform for The AI Guy (TAIG). It presents TAIG services, philosophy, and contact information to visitors. The repository is certified as a **Production Artifact (PA)** for its MVP scope.
 
-## MVP Scope
+## Current State
 
-Future MVP work (not yet implemented) will include:
+| Phase | Status |
+|-------|--------|
+| ACI-001 Foundation | Complete |
+| ACI-002 MVP Website | Complete |
+| ACI-003 DevOps to PA | Complete — **PA Approved** |
+
+**MVP includes:** Home, About, Services, Contact pages; shared navigation and branding; Nebula overview; contact form UI (no backend).
+
+## MVP Scope (Delivered)
 
 - Public-facing landing and informational pages
 - Service descriptions and Nebula content
-- Contact form
+- Contact form UI
+- Containerized deployment with CI/CD validation
+- Docker Hub publishing from `deployable` branch
+
+## Out Of Scope
+
+Deferred to future work:
+
+- Contact form backend processing
 - Client authentication and portal access
 - Support ticketing and billing integration
-
-**Current state (ACI-001):** Minimal application shell with a placeholder home page, health endpoint, containerization, and CI validation only.
-
-## Out Of Scope (ACI-001)
-
-The following are explicitly deferred to future ACIs:
-
-- Landing page design and production content
-- About, services, and Nebula pages
-- Contact form logic
-- Authentication, ticketing, billing, and client portal
 - Database integration
-- AWS, CloudFront, and S3 deployment
+- Production AWS deployment (documented, not provisioned)
+- AI features
 
 ## Local Development Instructions
 
@@ -41,31 +47,21 @@ The following are explicitly deferred to future ACIs:
 ```bash
 git clone https://github.com/the-ai-guy-2k/taig_service_portal_TSP.git
 cd taig_service_portal_TSP
-npm install
+npm ci
 npm start
 ```
 
-The application listens on `http://localhost:3000` by default. Override the port with the `PORT` environment variable.
+The application listens on `http://localhost:3000` by default.
 
-### Development mode
-
-```bash
-npm run dev
-```
-
-Runs the server with Node's `--watch` flag for automatic restarts on file changes.
-
-### Health check
+### Validation
 
 ```bash
-curl http://localhost:3000/health
+npm run validate
+npm start &
+npm run smoke-test
 ```
-
-Expected response: `{"status":"ok"}`
 
 ### Docker
-
-Docker image builds are validated in GitHub Actions. To build locally (optional):
 
 ```bash
 docker build -t taig2k/taig_service_portal_tsp:local .
@@ -76,27 +72,33 @@ docker run -p 3000:3000 taig2k/taig_service_portal_tsp:local
 
 - **Branch model:** The `deployable` branch is the release candidate branch for production deployments.
 - **Container-first:** All environments run the same Docker image (`taig2k/taig_service_portal_tsp:<tag>`).
-- **CI-gated:** GitHub Actions validates repository structure, build integrity, and Docker image builds on every push and pull request.
-- **ACI-driven:** Work is scoped, tracked, and completed via ACI (Approved Change Instructions) with completion reports in `/docs/reports`.
-- **Incremental delivery:** Foundation first, then MVP features, then infrastructure — each ACI produces a verifiable, deployable increment.
+- **CI-gated:** GitHub Actions validates build, routes, and Docker image on every push and pull request.
+- **Automated publish:** Pushes to `deployable` trigger Docker Hub publication via GitHub Actions secrets.
+- **ACI-driven:** Work is scoped, tracked, and completed via ACI with completion reports in `/docs/reports`.
+
+## Deployment Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [deployment_runbook.md](docs/reports/deployment_runbook.md) | Clone, build, validate, Docker, publish |
+| [aws_deployment_guide.md](docs/reports/aws_deployment_guide.md) | AWS S3, CloudFront, deployment sequence |
+| [PA_validation_report.md](docs/reports/PA_validation_report.md) | Production Artifact certification |
 
 ## Future Expansion Direction
 
-Planned evolution of this repository:
-
-1. **ACI-002+** — Public site content, layout, and branding
-2. **Subsequent ACIs** — Authentication, client portal, ticketing, billing
-3. **Infrastructure ACIs** — AWS deployment pipeline targeting the `deployable` branch
-
-The `src/` directory will grow to accommodate routes, views, API handlers, and shared modules as features are added.
+1. Contact form backend and integrations
+2. Authentication, client portal, ticketing, billing
+3. AWS infrastructure provisioning per deployment guide
+4. AI-powered features
 
 ## Repository Structure
 
 ```
 /docs/aci_history   — ACI tracking and governance
-/docs/reports       — ACI completion reports
+/docs/reports       — Completion reports, runbooks, PA validation
+/scripts            — Operational validation scripts
 /src                — Application source
-/.github/workflows  — CI pipelines
+/.github/workflows  — CI and Docker publish pipelines
 ```
 
 ## License

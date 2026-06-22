@@ -1,12 +1,14 @@
 {
   "name": "taig-service-portal",
-  "version": "0.2.0",
-  "description": "TAIG Service Portal (TSP) — MVP",
+  "version": "0.3.0",
+  "description": "TAIG Service Portal (TSP) — Production Artifact",
   "private": true,
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "validate": "node --check src/server.js",
+    "smoke-test": "node scripts/smoke-test.js"
   },
   "engines": {
     "node": ">=20.0.0"

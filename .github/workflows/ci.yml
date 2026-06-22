@@ -6,10 +6,18 @@ on:
   pull_request:
     branches: [main, deployable]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
-  validate:
-    name: Repository, Build & Docker Validation
+  validate-app:
+    name: Build & Route Validation
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -20,11 +28,17 @@ jobs:
           test -d docs/aci_history
           test -d docs/reports
           test -d src
+          test -d scripts
           test -d .github/workflows
           test -f README.md
           test -f Dockerfile
           test -f package.json
+          test -f package-lock.json
           test -f src/server.js
+          test -f scripts/smoke-test.js
+          test -f docs/reports/deployment_runbook.md
+          test -f docs/reports/aws_deployment_guide.md
+          test -f docs/reports/PA_validation_report.md
           echo "Repository structure OK"
 
       - name: Setup Node.js
@@ -37,23 +51,72 @@ jobs:
         run: npm ci
 
       - name: Build validation
-        run: |
-          node --check src/server.js
-          echo "Build validation OK"
+        run: npm run validate
 
       - name: Start application
         run: |
           npm start &
-          sleep 3
+          echo $! > app.pid
 
-      - name: Health check
+      - name: Wait for application
         run: |
-          curl -f http://localhost:3000/health
-          curl -f http://localhost:3000/ | grep -q "Technology that starts with your business problem"
-          curl -f http://localhost:3000/about | grep -q "Start With The Problem"
-          curl -f http://localhost:3000/services | grep -q "IT Support"
-          curl -f http://localhost:3000/contact | grep -q "Send a Message"
-          curl -f http://localhost:3000/ | grep -q "Nebula"
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/health > /dev/null; then
+              echo "Application ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Application failed to start within 30s"
+          exit 1
 
-      - name: Docker build validation
+      - name: Route validation
+        run: npm run smoke-test
+
+      - name: Stop application
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            kill "$(cat app.pid)" 2>/dev/null || true
+          fi
+
+  validate-docker:
+    name: Docker Build & Container Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: validate-app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build Docker image
         run: docker build -t taig2k/taig_service_portal_tsp:ci .
+
+      - name: Run container
+        run: docker run -d --name tsp-ci -p 3000:3000 taig2k/taig_service_portal_tsp:ci
+
+      - name: Wait for container
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/health > /dev/null; then
+              echo "Container ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Container failed health check within 30s"
+          docker logs tsp-ci
+          exit 1
+
+      - name: Route validation (container)
+        run: node scripts/smoke-test.js
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f tsp-ci 2>/dev/null || true

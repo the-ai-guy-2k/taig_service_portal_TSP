@@ -14,6 +14,7 @@ This directory tracks **Approved Change Instructions (ACIs)** issued for the TAI
 |---------|--------------------|-----------|--------------------------------------------------------|
 | ACI-001 | PA Foundation      | Completed | [ACI-001-completion-report.md](../reports/ACI-001-completion-report.md) |
 | ACI-002 | MVP Implementation | Completed | [ACI-002-completion-report.md](../reports/ACI-002-completion-report.md) |
+| ACI-003 | DevOps to PA       | Completed | [ACI-003-completion-report.md](../reports/ACI-003-completion-report.md) |
 
 ## Adding a New ACI
 
