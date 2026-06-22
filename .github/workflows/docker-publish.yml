@@ -61,8 +61,10 @@ jobs:
     name: Publish to Docker Hub
     runs-on: ubuntu-latest
     needs: build
-    if: vars.DOCKER_PUBLISH_ENABLED == 'true'
     timeout-minutes: 20
+    outputs:
+      primary_tag: ${{ steps.meta.outputs.version }}
+      all_tags: ${{ steps.meta.outputs.tags }}
 
     steps:
       - name: Checkout
@@ -86,6 +88,7 @@ jobs:
             type=raw,value=latest
             type=raw,value=deployable
             type=sha,prefix=sha-
+            type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -98,4 +101,49 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Published tags
-        run: echo "${{ steps.meta.outputs.tags }}"
+        run: |
+          echo "Published image tags:"
+          echo "${{ steps.meta.outputs.tags }}"
+
+  pull-validate:
+    name: Pull & Smoke Validate
+    runs-on: ubuntu-latest
+    needs: publish
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Pull published image
+        run: docker pull taig2k/taig_service_portal_tsp:deployable
+
+      - name: Run pulled image
+        run: docker run -d --name tsp-pulled -p 3000:3000 taig2k/taig_service_portal_tsp:deployable
+
+      - name: Wait for container
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/health > /dev/null; then
+              echo "Pulled image ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs tsp-pulled
+          exit 1
+
+      - name: Health check
+        run: curl -f http://localhost:3000/health
+
+      - name: Route smoke test
+        run: node scripts/smoke-test.js
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f tsp-pulled 2>/dev/null || true
