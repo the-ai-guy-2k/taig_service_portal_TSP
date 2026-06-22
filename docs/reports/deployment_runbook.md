@@ -170,18 +170,29 @@ docker rm -f tsp
 
 ## 5. Docker Hub Publication Instructions
 
+### Confirmed publish process (ACI-004)
+
+Docker Hub publication is **confirmed working** as of 2026-06-22.
+
+| Item | Value |
+|------|-------|
+| Docker Hub repository | `taig2k/taig_service_portal_tsp` |
+| Workflow | `.github/workflows/docker-publish.yml` |
+| Trigger | Push to `deployable` branch or manual `workflow_dispatch` |
+| Primary validation tag | `deployable` |
+| Also published | `latest`, `sha-<commit>` |
+
+**Validated publish run:** [GitHub Actions #4](https://github.com/the-ai-guy-2k/taig_service_portal_TSP/actions/runs/27975312056) — all jobs passed (build, publish, pull-validate).
+
 ### Automated publication (recommended)
 
 Publication runs automatically via GitHub Actions when changes are pushed to the `deployable` branch.
 
-**Workflow file:** `.github/workflows/docker-publish.yml`
+**Workflow jobs:**
 
-#### Enable automated publishing
-
-1. Configure secrets (above)
-2. Set repository variable **`DOCKER_PUBLISH_ENABLED`** to `true` in **Settings → Secrets and variables → Actions → Variables**
-
-Publishing is skipped when this variable is not `true`, allowing workflow validation without credentials.
+1. **Build & Validate Image** — builds image, runs container smoke tests
+2. **Publish to Docker Hub** — authenticates via secrets, pushes tagged image
+3. **Pull & Smoke Validate** — pulls `deployable` tag from Docker Hub, runs smoke tests
 
 #### Required GitHub Secrets
 
@@ -192,23 +203,48 @@ Configure in repository **Settings → Secrets and variables → Actions**:
 | `DOCKERHUB_USERNAME` | Docker Hub username (`taig2k`) |
 | `DOCKERHUB_TOKEN` | Docker Hub access token (not password) |
 
-#### Required repository variable
-
-| Variable | Value | Purpose |
-|----------|-------|---------|
-| `DOCKER_PUBLISH_ENABLED` | `true` | Enables push job after secrets are configured |
-
 Create a Docker Hub access token at: https://hub.docker.com/settings/security
+
+> **Note:** `DOCKER_PUBLISH_ENABLED` variable was used during ACI-003 staging. As of ACI-004, publish runs automatically on `deployable` push when secrets are configured.
 
 #### Published tags
 
 On each successful `deployable` push:
 
-| Tag | Description |
-|-----|-------------|
-| `latest` | Current production candidate |
-| `deployable` | Release branch marker |
-| `<short-sha>` | Git commit identifier |
+| Tag | Description | Example |
+|-----|-------------|---------|
+| `latest` | Current production candidate | `taig2k/taig_service_portal_tsp:latest` |
+| `deployable` | Release branch marker (used for pull validation) | `taig2k/taig_service_portal_tsp:deployable` |
+| `sha-<commit>` | Git commit identifier | `taig2k/taig_service_portal_tsp:sha-d18370d` |
+
+#### Pull command
+
+```bash
+docker pull taig2k/taig_service_portal_tsp:deployable
+```
+
+Or use `latest`:
+
+```bash
+docker pull taig2k/taig_service_portal_tsp:latest
+```
+
+#### Pull validation procedure
+
+```bash
+docker pull taig2k/taig_service_portal_tsp:deployable
+docker run -d --name tsp -p 3000:3000 taig2k/taig_service_portal_tsp:deployable
+
+# Health check
+curl -f http://localhost:3000/health
+
+# Route smoke test (from repository root)
+npm run smoke-test
+
+docker rm -f tsp
+```
+
+GitHub Actions performs equivalent pull validation automatically in the **Pull & Smoke Validate** job after each publish.
 
 #### Manual trigger
 
@@ -267,7 +303,8 @@ For AWS hosting options, see [aws_deployment_guide.md](./aws_deployment_guide.md
 | `npm ci` fails | Ensure `package-lock.json` is present; use Node 20+ |
 | Smoke test connection refused | Confirm app/container is running on expected port |
 | Docker build fails | Verify Docker daemon is running; check Dockerfile context |
-| Docker publish fails in CI | Verify `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secrets |
+| Docker publish fails in CI | Verify `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secrets are set |
+| Pull fails after publish | Allow 1–2 minutes for Docker Hub propagation; verify tag at hub.docker.com |
 | Port 3000 in use | Set `PORT` env var or map a different host port |
 
 ---

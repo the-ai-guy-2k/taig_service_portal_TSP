@@ -56,7 +56,7 @@ TSP qualifies as a Production Artifact for its defined MVP scope. The repository
 | `deployment_runbook.md` | **Pass** | Clone, build, validate, Docker, publish procedures |
 | `aws_deployment_guide.md` | **Pass** | S3, CloudFront, AWS services, deployment sequence |
 | `PA_validation_report.md` | **Pass** | This assessment |
-| ACI completion reports | **Pass** | ACI-001, ACI-002, ACI-003 |
+| ACI completion reports | **Pass** | ACI-001 through ACI-004 |
 | GitHub Actions workflows | **Pass** | CI and Docker Publish documented in runbook |
 
 **Assessment:** Documentation is sufficient for operator onboarding and PA certification.
@@ -71,8 +71,10 @@ TSP qualifies as a Production Artifact for its defined MVP scope. The repository
 | Container health check | **Pass** | Dockerfile `HEALTHCHECK` directive |
 | CI on push/PR | **Pass** | `.github/workflows/ci.yml` |
 | Docker Hub publish workflow | **Pass** | `.github/workflows/docker-publish.yml` |
+| Docker Hub publication confirmed | **Pass** | ACI-004 — image published and pull-validated |
 | Secrets-based auth | **Pass** | `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` |
-| Automated tagging | **Pass** | `latest`, `deployable`, commit SHA |
+| Automated tagging | **Pass** | `latest`, `deployable`, `sha-<commit>` |
+| Pull validation | **Pass** | GitHub Actions pull-validate job + local pull confirmed |
 | Rollback capability | **Pass** | Image tags by SHA support redeployment of prior versions |
 | Monitoring hooks | **Partial** | Health endpoint available; CloudWatch integration documented for AWS phase |
 
@@ -84,7 +86,7 @@ TSP qualifies as a Production Artifact for its defined MVP scope. The repository
 
 | Risk | Severity | Mitigation |
 |------|----------|------------|
-| Docker Hub secrets not configured | Medium | Set `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, and `DOCKER_PUBLISH_ENABLED=true` before first publish |
+| Docker Hub secrets not configured | Medium | Resolved in ACI-004 — secrets configured; publish confirmed |
 | Contact form non-functional | Low | Documented out of scope; UI-only by design |
 | No production AWS deployment yet | Medium | `aws_deployment_guide.md` provides sequence; deployment is future operator action |
 | Server-rendered app limits S3-only hosting | Low | AWS guide documents container path as recommended |
@@ -124,10 +126,25 @@ TSP qualifies as a Production Artifact for its defined MVP scope. The repository
 
 **Conditions for production go-live (post-PA):**
 
-1. Configure GitHub Secrets for Docker Hub publishing.
+1. ~~Configure GitHub Secrets for Docker Hub publishing.~~ **Complete (ACI-004)**
 2. Execute AWS infrastructure provisioning per `aws_deployment_guide.md`.
 3. Confirm production contact email and content with business stakeholders.
 4. Run smoke tests against production URL after deployment.
+
+---
+
+## 8. Docker Hub Publication Evidence (ACI-004)
+
+| Evidence | Value |
+|----------|-------|
+| Docker Hub repository | https://hub.docker.com/r/taig2k/taig_service_portal_tsp |
+| Published tags | `latest`, `deployable`, `sha-d18370d` |
+| Publish commit | `d18370d6a29ade2c012edab7a5d15eb05e846eb5` |
+| GitHub Actions run | https://github.com/the-ai-guy-2k/taig_service_portal_TSP/actions/runs/27975312056 |
+| Workflow result | **success** (build, publish, pull-validate) |
+| Pull validation | `docker pull taig2k/taig_service_portal_tsp:deployable` — confirmed |
+| Image digest | `sha256:a2add4621e7be108cb4fb0e9636177fd3bc8105f5a0e287e67cc40b014d7d9ab` |
+| Smoke tests | 6/6 passed on pulled image (CI and local) |
 
 ---
 
