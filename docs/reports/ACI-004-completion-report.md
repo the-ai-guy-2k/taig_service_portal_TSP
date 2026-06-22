@@ -146,4 +146,4 @@ ACI-004 closes the Docker Hub publication evidence gap identified after ACI-003.
 | Commit | Description |
 |--------|-------------|
 | `d18370d6a29ade2c012edab7a5d15eb05e846eb5` | Enable publish + pull-validate workflow |
-| _pending_ | Documentation and ACI-004 completion report |
+| `6e071af769d7f1de3770dddca23bfda05dfeccc5` | Documentation and ACI-004 completion report |
