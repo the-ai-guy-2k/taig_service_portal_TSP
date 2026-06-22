@@ -84,7 +84,7 @@ TSP qualifies as a Production Artifact for its defined MVP scope. The repository
 
 | Risk | Severity | Mitigation |
 |------|----------|------------|
-| Docker Hub secrets not configured | Medium | Documented in runbook; publish workflow fails clearly until secrets set |
+| Docker Hub secrets not configured | Medium | Set `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, and `DOCKER_PUBLISH_ENABLED=true` before first publish |
 | Contact form non-functional | Low | Documented out of scope; UI-only by design |
 | No production AWS deployment yet | Medium | `aws_deployment_guide.md` provides sequence; deployment is future operator action |
 | Server-rendered app limits S3-only hosting | Low | AWS guide documents container path as recommended |

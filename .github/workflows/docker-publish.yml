@@ -18,9 +18,50 @@ permissions:
   contents: read
 
 jobs:
-  publish:
-    name: Build & Publish to Docker Hub
+  build:
+    name: Build & Validate Image
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build Docker image
+        run: docker build -t taig2k/taig_service_portal_tsp:publish-ci .
+
+      - name: Run container
+        run: docker run -d --name tsp-publish-ci -p 3000:3000 taig2k/taig_service_portal_tsp:publish-ci
+
+      - name: Wait for container
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/health > /dev/null; then
+              echo "Container ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs tsp-publish-ci
+          exit 1
+
+      - name: Route validation
+        run: node scripts/smoke-test.js
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f tsp-publish-ci 2>/dev/null || true
+
+  publish:
+    name: Publish to Docker Hub
+    runs-on: ubuntu-latest
+    needs: build
+    if: vars.DOCKER_PUBLISH_ENABLED == 'true'
     timeout-minutes: 20
 
     steps:
@@ -56,7 +97,5 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Verify image manifest
-        run: |
-          echo "Published tags:"
-          echo "${{ steps.meta.outputs.tags }}"
+      - name: Published tags
+        run: echo "${{ steps.meta.outputs.tags }}"

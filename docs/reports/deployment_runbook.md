@@ -176,6 +176,13 @@ Publication runs automatically via GitHub Actions when changes are pushed to the
 
 **Workflow file:** `.github/workflows/docker-publish.yml`
 
+#### Enable automated publishing
+
+1. Configure secrets (above)
+2. Set repository variable **`DOCKER_PUBLISH_ENABLED`** to `true` in **Settings → Secrets and variables → Actions → Variables**
+
+Publishing is skipped when this variable is not `true`, allowing workflow validation without credentials.
+
 #### Required GitHub Secrets
 
 Configure in repository **Settings → Secrets and variables → Actions**:
@@ -184,6 +191,12 @@ Configure in repository **Settings → Secrets and variables → Actions**:
 |--------|-------------|
 | `DOCKERHUB_USERNAME` | Docker Hub username (`taig2k`) |
 | `DOCKERHUB_TOKEN` | Docker Hub access token (not password) |
+
+#### Required repository variable
+
+| Variable | Value | Purpose |
+|----------|-------|---------|
+| `DOCKER_PUBLISH_ENABLED` | `true` | Enables push job after secrets are configured |
 
 Create a Docker Hub access token at: https://hub.docker.com/settings/security
 
