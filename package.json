@@ -1,0 +1,17 @@
+{
+  "name": "taig-service-portal",
+  "version": "0.1.0",
+  "description": "TAIG Service Portal (TSP) — foundation",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

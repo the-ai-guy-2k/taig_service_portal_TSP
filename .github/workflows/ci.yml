@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main, deployable]
+  pull_request:
+    branches: [main, deployable]
+
+jobs:
+  validate:
+    name: Repository, Build & Docker Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate repository structure
+        run: |
+          test -d docs/aci_history
+          test -d docs/reports
+          test -d src
+          test -d .github/workflows
+          test -f README.md
+          test -f Dockerfile
+          test -f package.json
+          test -f src/server.js
+          echo "Repository structure OK"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build validation
+        run: |
+          node --check src/server.js
+          echo "Build validation OK"
+
+      - name: Start application
+        run: |
+          npm start &
+          sleep 3
+
+      - name: Health check
+        run: |
+          curl -f http://localhost:3000/health
+          curl -f http://localhost:3000/ | grep -q "Application foundation placeholder"
+
+      - name: Docker build validation
+        run: docker build -t taig2k/taig_service_portal_tsp:ci .
