@@ -77,10 +77,23 @@ Health check step validates:
 
 ## 6. Commit ID(s)
 
-_To be updated after push._
+| Commit | Branch | Description |
+|--------|--------|-------------|
+| `0cb5ec3` (`0cb5ec3467538ab8c75085a1ffa1095c22566e5f`) | `main`, `deployable` | ACI-002 MVP implementation |
 
 ---
 
 ## 7. GitHub Actions Results
 
-_To be updated after CI run completes._
+**Workflow:** CI (`.github/workflows/ci.yml`)  
+**Trigger:** Push to `main` and `deployable`  
+**Overall status:** All runs passed
+
+| Run | Branch | Conclusion | URL |
+|-----|--------|------------|-----|
+| #5 | `main` | **success** | https://github.com/the-ai-guy-2k/taig_service_portal_TSP/actions/runs/27974151387 |
+| #6 | `deployable` | **success** | https://github.com/the-ai-guy-2k/taig_service_portal_TSP/actions/runs/27974152907 |
+
+All CI steps passed including repository structure validation, `npm ci`, build validation, MVP page smoke tests, and Docker build validation.
+
+Repository: https://github.com/the-ai-guy-2k/taig_service_portal_TSP
