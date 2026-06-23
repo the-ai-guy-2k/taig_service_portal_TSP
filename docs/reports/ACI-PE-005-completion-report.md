@@ -98,7 +98,7 @@ Evidence: repeatable smoke tests, route validation, reboot resilience, Terraform
 
 ## 10. Commit ID(s)
 
-_To be recorded after documentation commit._
+`b0a1400` — ACI-PE-005: PE validation report — routes, smoke, reboot, PAPEV ready.
 
 ---
 
