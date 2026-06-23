@@ -22,6 +22,7 @@ This directory tracks **Approved Change Instructions (ACIs)** issued for the TAI
 | ACI-PE-002 | Terraform Plan Review | Completed | [ACI-PE-002-completion-report.md](../reports/ACI-PE-002-completion-report.md) |
 | ACI-PE-003 | PE Creation Preparation | Completed | [ACI-PE-003-completion-report.md](../reports/ACI-PE-003-completion-report.md) |
 | ACI-PE-004 | PE Creation | Blocked | [ACI-PE-004-completion-report.md](../reports/ACI-PE-004-completion-report.md) |
+| ACI-PE-004A | PE Blocker Resolution | Admin action required | [ACI-PE-004A-completion-report.md](../reports/ACI-PE-004A-completion-report.md) |
 
 ## Adding a New ACI
 

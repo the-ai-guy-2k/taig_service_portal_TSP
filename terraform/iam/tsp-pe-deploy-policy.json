@@ -1,0 +1,59 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "TspPeIamRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:GetRole",
+        "iam:UpdateRole",
+        "iam:TagRole",
+        "iam:PassRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::526123657916:role/tsp-production-apprunner-access",
+        "arn:aws:iam::526123657916:role/tsp-production-apprunner-instance"
+      ]
+    },
+    {
+      "Sid": "TspPeIamPolicyAttach",
+      "Effect": "Allow",
+      "Action": [
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy"
+      ],
+      "Resource": "arn:aws:iam::526123657916:role/tsp-production-apprunner-access"
+    },
+    {
+      "Sid": "TspPeAppRunner",
+      "Effect": "Allow",
+      "Action": [
+        "apprunner:CreateService",
+        "apprunner:DeleteService",
+        "apprunner:DescribeService",
+        "apprunner:UpdateService",
+        "apprunner:ListServices",
+        "apprunner:CreateAutoScalingConfiguration",
+        "apprunner:DeleteAutoScalingConfiguration",
+        "apprunner:DescribeAutoScalingConfiguration",
+        "apprunner:ListAutoScalingConfigurations",
+        "apprunner:TagResource",
+        "apprunner:UntagResource",
+        "apprunner:ListTagsForResource"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "TspPeEcrRead",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:DescribeRepositories",
+        "ecr:DescribeImages",
+        "ecr:GetAuthorizationToken"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
