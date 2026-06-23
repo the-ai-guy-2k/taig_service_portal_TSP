@@ -104,7 +104,7 @@ Then ACI-PE-004B may run `terraform apply -var-file=terraform.tfvars`.
 
 ## 10. Commit ID(s)
 
-_To be recorded after documentation commit._
+`8d279e1` — ACI-PE-004A: Document PE blockers and add minimal IAM deploy policy template.
 
 ---
 
