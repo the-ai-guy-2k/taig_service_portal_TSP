@@ -105,7 +105,7 @@ The Terraform foundation is validated and ready for Terraform Plan Review (ACI-P
 
 ## 10. Commit ID(s)
 
-_To be updated after push._
+| `24ea547` (`24ea54746e809878db5a8d3f8844d02c15363bde`) | ACI-PE-001R validated foundation commit |
 
 ---
 
