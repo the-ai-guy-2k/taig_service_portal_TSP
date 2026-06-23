@@ -2,40 +2,42 @@
 
 Terraform definitions for the TAIG Service Portal (TSP) **Production Environment** on AWS.
 
-**Status:** Foundation validated (ACI-PE-001R) — ready for `terraform plan` review. No resources applied.
+**Status:** EC2 broke-mode pivot drafted (ACI-PE-004B) — App Runner gated; ready for EC2 apply ACI.
 
 ## Purpose
 
 This directory defines the TSP Production Environment as code:
 
 - **Target cloud:** AWS (`us-east-1`)
-- **Compute:** AWS App Runner
+- **Compute (default):** EC2 + Docker (`compute_platform = "ec2"`, t3.micro)
+- **Compute (optional):** App Runner (`compute_platform = "apprunner"` — requires IAM + subscription)
 - **Container image:** `taig2k/taig_service_portal_tsp:deployable` (validated in ACI-004)
-- **Health check:** `GET /health` on port `3000`
-
-The configuration is reviewable, repeatable, and version-controlled. Apply is deferred to a later ACI.
+- **Health check:** `GET /health` on port `3000` (exposed on host port `80` for EC2)
 
 ## Terraform Structure
 
 ```
 terraform/
-├── main.tf                  # Provider, IAM roles, App Runner service
+├── main.tf                  # Provider, ECR repository
+├── ec2.tf                   # Broke-mode EC2 + security group (default path)
+├── apprunner.tf             # App Runner path (gated by compute_platform)
 ├── variables.tf             # Input variables
 ├── outputs.tf               # Planned and post-apply outputs
-├── terraform.tfvars.example # Example variable values (copy to terraform.tfvars)
-├── README.md                # This file
-└── .gitignore               # Excludes state and local secrets
+├── templates/ec2-user-data.sh.tpl
+├── iam/tsp-pe-deploy-policy.json
+├── terraform.tfvars.example
+└── .gitignore
 ```
 
-### Resources defined (not yet created)
+### Resources — EC2 path (default, `compute_platform = "ec2"`)
 
 | Resource | Purpose |
 |----------|---------|
-| `aws_iam_role.apprunner_access` | Allows App Runner to pull container images |
-| `aws_iam_role_policy_attachment.apprunner_access_ecr` | ECR read policy for image pull |
-| `aws_iam_role.apprunner_instance` | Runtime role for App Runner tasks |
-| `aws_apprunner_auto_scaling_configuration_version.tsp` | Auto scaling bounds |
-| `aws_apprunner_service.tsp` | TSP App Runner service |
+| `aws_ecr_repository.tsp` | Optional mirror target (exists from PE-004) |
+| `aws_security_group.tsp_ec2` | HTTP ingress on port 80 |
+| `aws_instance.tsp` | AL2023 host; Docker runs TSP image |
+
+See [PE_architecture_pivot_review.md](../docs/reports/PE_architecture_pivot_review.md) for pivot rationale.
 
 ## Variables
 

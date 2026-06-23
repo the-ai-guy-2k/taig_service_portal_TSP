@@ -33,7 +33,7 @@ locals {
   image_identifier        = "${aws_ecr_repository.tsp.repository_url}:${var.docker_image_tag}"
 }
 
-# Private ECR repository for the TSP container image (mirrored from Docker Hub before App Runner deploy).
+# ECR repository retained from PE-004 (optional mirror target; not required for EC2 Docker Hub path).
 resource "aws_ecr_repository" "tsp" {
   name                 = var.ecr_repository_name
   image_tag_mutability = "MUTABLE"
@@ -42,106 +42,6 @@ resource "aws_ecr_repository" "tsp" {
   image_scanning_configuration {
     scan_on_push = var.ecr_scan_on_push
   }
-
-  tags = var.tags
-}
-
-# IAM role allowing App Runner to pull the container image from ECR.
-resource "aws_iam_role" "apprunner_access" {
-  name = "${var.service_name}-apprunner-access"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "build.apprunner.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "apprunner_access_ecr" {
-  role       = aws_iam_role.apprunner_access.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess"
-}
-
-# IAM role assumed by the running App Runner service tasks.
-resource "aws_iam_role" "apprunner_instance" {
-  name = "${var.service_name}-apprunner-instance"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "tasks.apprunner.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-# Auto scaling configuration for the App Runner service.
-resource "aws_apprunner_auto_scaling_configuration_version" "tsp" {
-  auto_scaling_configuration_name = "${var.service_name}-autoscaling"
-  max_concurrency                 = var.max_concurrency
-  max_size                        = var.max_size
-  min_size                        = var.min_size
-
-  tags = var.tags
-}
-
-# TSP Production Environment — AWS App Runner service (definition only; not applied in ACI-PE-001).
-resource "aws_apprunner_service" "tsp" {
-  service_name = var.service_name
-
-  source_configuration {
-    authentication_configuration {
-      access_role_arn = aws_iam_role.apprunner_access.arn
-    }
-
-    auto_deployments_enabled = var.auto_deployments_enabled
-
-    image_repository {
-      image_identifier      = local.image_identifier
-      image_repository_type = var.image_repository_type
-
-      image_configuration {
-        port = tostring(var.application_port)
-
-        runtime_environment_variables = merge(
-          {
-            NODE_ENV = "production"
-            PORT     = tostring(var.application_port)
-          },
-          var.runtime_environment_variables
-        )
-      }
-    }
-  }
-
-  instance_configuration {
-    cpu               = var.cpu
-    memory            = var.memory
-    instance_role_arn = aws_iam_role.apprunner_instance.arn
-  }
-
-  health_check_configuration {
-    protocol            = "HTTP"
-    path                = var.health_check_path
-    interval            = var.health_check_interval
-    timeout             = var.health_check_timeout
-    healthy_threshold   = var.health_check_healthy_threshold
-    unhealthy_threshold = var.health_check_unhealthy_threshold
-  }
-
-  auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.tsp.arn
 
   tags = var.tags
 }

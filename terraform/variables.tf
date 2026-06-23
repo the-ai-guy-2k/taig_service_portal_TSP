@@ -17,9 +17,61 @@ variable "environment" {
 }
 
 variable "service_name" {
-  description = "AWS App Runner service name for TSP."
+  description = "TSP production service name prefix for compute resources."
   type        = string
   default     = "tsp-production"
+}
+
+variable "compute_platform" {
+  description = "Production compute target: ec2 (broke-mode default) or apprunner (requires IAM + App Runner subscription)."
+  type        = string
+  default     = "ec2"
+
+  validation {
+    condition     = contains(["ec2", "apprunner"], var.compute_platform)
+    error_message = "compute_platform must be ec2 or apprunner."
+  }
+}
+
+variable "ec2_instance_type" {
+  description = "EC2 instance type. Use x86_64 types (t3.micro, t2.micro) for amd64 container image."
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "ec2_ami_ssm_parameter" {
+  description = "SSM parameter for Amazon Linux 2023 x86_64 AMI (used when compute_platform = ec2)."
+  type        = string
+  default     = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+}
+
+variable "ec2_image_source" {
+  description = "Container image source for EC2 user_data: docker_hub (no IAM profile) or ecr (requires instance profile — not implemented)."
+  type        = string
+  default     = "docker_hub"
+
+  validation {
+    condition     = contains(["docker_hub", "ecr"], var.ec2_image_source)
+    error_message = "ec2_image_source must be docker_hub or ecr."
+  }
+}
+
+variable "ec2_host_port" {
+  description = "Host port exposed on the EC2 instance (maps to application_port in container)."
+  type        = number
+  default     = 80
+}
+
+variable "ec2_ingress_cidr_blocks" {
+  description = "CIDR blocks allowed to reach the EC2 host port."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "ec2_root_volume_gb" {
+  description = "Root EBS volume size in GB for the EC2 instance."
+  type        = number
+  default     = 8
 }
 
 variable "docker_hub_image" {

@@ -7,7 +7,13 @@ aws_skip_credential_checks  = false
 environment                 = "production"
 service_name                = "tsp-production"
 
-# Docker Hub source (mirrored to ECR before App Runner deploy)
+# Broke-mode PE: ec2 (default). Use apprunner only after IAM + App Runner subscription are resolved.
+compute_platform = "ec2"
+ec2_instance_type = "t3.micro"
+ec2_image_source  = "docker_hub"
+ec2_host_port     = 80
+
+# Docker Hub source (EC2 pull; optional mirror to ECR)
 docker_hub_image = "taig2k/taig_service_portal_tsp"
 docker_image_tag = "deployable"
 
@@ -35,5 +41,5 @@ health_check_unhealthy_threshold = 3
 runtime_environment_variables = {}
 
 tags = {
-  ACI = "PE-003"
+  ACI = "PE-004B"
 }
