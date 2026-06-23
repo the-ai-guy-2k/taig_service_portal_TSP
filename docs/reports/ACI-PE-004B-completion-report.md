@@ -142,7 +142,7 @@ No admin IAM action required for Docker Hub path.
 
 ## 14. Commit ID(s)
 
-_To be recorded after commit._
+`f821aad` — ACI-PE-004B: Pivot PE Terraform to EC2 broke-mode with gated App Runner.
 
 ---
 
