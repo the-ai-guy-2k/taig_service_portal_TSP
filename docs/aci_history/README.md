@@ -26,6 +26,7 @@ This directory tracks **Approved Change Instructions (ACIs)** issued for the TAI
 | ACI-PE-004B | PE Architecture Pivot Assessment | Completed | [ACI-PE-004B-completion-report.md](../reports/ACI-PE-004B-completion-report.md) |
 | ACI-PE-004C | EC2 PE Creation | Completed | [ACI-PE-004C-completion-report.md](../reports/ACI-PE-004C-completion-report.md) |
 | ACI-PE-005 | PE Validation | Completed | [ACI-PE-005-completion-report.md](../reports/ACI-PE-005-completion-report.md) |
+| ACI-PE-006 | PAPEV Certification | Completed | [ACI-PE-006-completion-report.md](../reports/ACI-PE-006-completion-report.md) |
 
 ## Adding a New ACI
 
