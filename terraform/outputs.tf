@@ -9,8 +9,23 @@ output "planned_region" {
 }
 
 output "planned_image" {
-  description = "Planned container image identifier (repository:tag)."
+  description = "Planned ECR container image identifier (repository:tag)."
   value       = local.image_identifier
+}
+
+output "docker_hub_source_image" {
+  description = "Docker Hub source image to mirror before App Runner deployment."
+  value       = local.docker_hub_source_image
+}
+
+output "ecr_repository_url" {
+  description = "ECR repository URL for image mirroring and deployment."
+  value       = aws_ecr_repository.tsp.repository_url
+}
+
+output "ecr_repository_arn" {
+  description = "ECR repository ARN."
+  value       = aws_ecr_repository.tsp.arn
 }
 
 output "future_service_url" {

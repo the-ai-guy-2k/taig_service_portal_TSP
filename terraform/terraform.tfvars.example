@@ -2,15 +2,17 @@
 # Copy to terraform.tfvars and adjust before terraform plan/apply.
 # Do NOT commit terraform.tfvars (contains environment-specific values).
 
-aws_region       = "us-east-1"
-environment      = "production"
-service_name     = "tsp-production"
+aws_region                  = "us-east-1"
+aws_skip_credential_checks  = false
+environment                 = "production"
+service_name                = "tsp-production"
 
-docker_image     = "taig2k/taig_service_portal_tsp"
+# Docker Hub source (mirrored to ECR before App Runner deploy)
+docker_hub_image = "taig2k/taig_service_portal_tsp"
 docker_image_tag = "deployable"
 
-# App Runner supports ECR and ECR_PUBLIC natively. Mirror the Docker Hub image
-# to ECR before apply, then set docker_image to the ECR repository URI.
+# ECR repository (created by Terraform; App Runner pulls from here)
+ecr_repository_name = "taig-service-portal-tsp"
 image_repository_type = "ECR"
 
 application_port = 3000
@@ -22,7 +24,7 @@ memory = "512"
 
 max_concurrency = 100
 min_size        = 1
-max_size        = 3
+max_size        = 2
 
 health_check_path                = "/health"
 health_check_interval            = 10
@@ -33,5 +35,5 @@ health_check_unhealthy_threshold = 3
 runtime_environment_variables = {}
 
 tags = {
-  ACI = "PE-001"
+  ACI = "PE-003"
 }

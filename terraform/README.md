@@ -111,7 +111,29 @@ terraform plan -var-file=terraform.tfvars.plan-review
 
 See [PE_plan_review.md](../docs/reports/PE_plan_review.md) for full assessment.
 
-`terraform.tfvars.plan-review` enables offline structural plan review (`aws_skip_credential_checks = true`). **Do not use for apply.** Before apply, mirror the Docker Hub image to ECR and run plan with real credentials using `terraform.tfvars` (`aws_skip_credential_checks = false`).
+`terraform.tfvars.plan-review` enables offline structural plan review (`aws_skip_credential_checks = true`). **Do not use for apply.**
+
+### Pre-apply preparation (ACI-PE-003)
+
+See [PE_pre_apply_review.md](../docs/reports/PE_pre_apply_review.md).
+
+**Image source:** ECR (private). Mirror Docker Hub image before App Runner deployment:
+
+```powershell
+# After ECR repository exists (terraform apply -target=aws_ecr_repository.tsp)
+.\scripts\mirror-image-to-ecr.ps1
+```
+
+**State handling (PE Phase 1):** Local `terraform.tfstate` in `terraform/`. Remote S3 backend deferred — see `backend.tf.example`.
+
+**Real credential plan:**
+
+```bash
+aws sts get-caller-identity
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+terraform plan -var-file=terraform.tfvars
+```
 
 ### Validation only (no AWS credentials required)
 
@@ -123,15 +145,19 @@ terraform validate
 
 ## Apply Instructions
 
-> **Not in scope for ACI-PE-001.** Apply belongs to a later ACI after plan review and approval.
+> Apply belongs to a post-PE-003 ACI after pre-apply review approval.
 
-When authorized:
+**Recommended apply sequence:**
 
 ```bash
-cd terraform
-terraform init
+# 1. Create ECR repository only
+terraform apply -target=aws_ecr_repository.tsp
+
+# 2. Mirror Docker Hub image to ECR
+..\scripts\mirror-image-to-ecr.ps1
+
+# 3. Full apply (remaining resources)
 terraform plan -out=tfplan
-# Review plan with stakeholders
 terraform apply tfplan
 ```
 

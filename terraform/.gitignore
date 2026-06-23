@@ -6,6 +6,7 @@
 !*.tfvars.example
 !terraform.tfvars.plan-review
 plan-output.txt
+plan-output-pe003.txt
 crash.log
 crash.*.log
 override.tf

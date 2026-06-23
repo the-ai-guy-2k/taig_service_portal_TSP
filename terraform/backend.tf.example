@@ -1,0 +1,13 @@
+# Remote state backend — NOT ACTIVE (ACI-PE-003 decision: local state for PE Phase 1)
+#
+# Uncomment and configure when promoting to production-grade state management.
+#
+# terraform {
+#   backend "s3" {
+#     bucket         = "taig-tsp-terraform-state"
+#     key            = "production/terraform.tfstate"
+#     region         = "us-east-1"
+#     dynamodb_table = "taig-tsp-terraform-locks"
+#     encrypt        = true
+#   }
+# }

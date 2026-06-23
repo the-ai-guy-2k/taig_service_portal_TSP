@@ -29,10 +29,24 @@ provider "aws" {
 }
 
 locals {
-  image_identifier = "${var.docker_image}:${var.docker_image_tag}"
+  docker_hub_source_image = "${var.docker_hub_image}:${var.docker_image_tag}"
+  image_identifier        = "${aws_ecr_repository.tsp.repository_url}:${var.docker_image_tag}"
 }
 
-# IAM role allowing App Runner to pull the container image from the configured registry.
+# Private ECR repository for the TSP container image (mirrored from Docker Hub before App Runner deploy).
+resource "aws_ecr_repository" "tsp" {
+  name                 = var.ecr_repository_name
+  image_tag_mutability = "MUTABLE"
+  force_delete         = var.ecr_force_delete
+
+  image_scanning_configuration {
+    scan_on_push = var.ecr_scan_on_push
+  }
+
+  tags = var.tags
+}
+
+# IAM role allowing App Runner to pull the container image from ECR.
 resource "aws_iam_role" "apprunner_access" {
   name = "${var.service_name}-apprunner-access"
 

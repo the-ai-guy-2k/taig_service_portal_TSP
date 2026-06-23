@@ -22,8 +22,8 @@ variable "service_name" {
   default     = "tsp-production"
 }
 
-variable "docker_image" {
-  description = "Container image repository. Validated image: taig2k/taig_service_portal_tsp. May require ECR mirror before apply (see terraform/README.md)."
+variable "docker_hub_image" {
+  description = "Source Docker Hub repository for pre-apply image mirroring (ACI-004 validated image)."
   type        = string
   default     = "taig2k/taig_service_portal_tsp"
 }
@@ -34,8 +34,26 @@ variable "docker_image_tag" {
   default     = "deployable"
 }
 
+variable "ecr_repository_name" {
+  description = "ECR repository name for the TSP production image."
+  type        = string
+  default     = "taig-service-portal-tsp"
+}
+
+variable "ecr_force_delete" {
+  description = "Allow ECR repository deletion even when images exist (useful for PE test teardown)."
+  type        = bool
+  default     = true
+}
+
+variable "ecr_scan_on_push" {
+  description = "Enable basic image scanning on push to ECR."
+  type        = bool
+  default     = true
+}
+
 variable "image_repository_type" {
-  description = "App Runner image repository type. Valid values: ECR, ECR_PUBLIC. Docker Hub images may require mirroring to ECR before apply."
+  description = "App Runner image repository type. ECR is required for private ECR deployment."
   type        = string
   default     = "ECR"
 
