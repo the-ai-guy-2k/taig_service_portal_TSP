@@ -101,7 +101,7 @@ Minimal IAM, ECR scan on push, no secrets in code, public App Runner URL for MVP
 
 ## 12. Commit ID(s)
 
-_To be updated after push._
+| `631fcf8` (`631fcf8a4d9c25175007b6674b33b4664d3e064c`) | ACI-PE-003 PE preparation |
 
 ---
 
