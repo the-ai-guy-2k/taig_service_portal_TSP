@@ -1,206 +1,175 @@
 # TSP Production Environment — Creation Report
 
-**ACI:** ACI-PE-004  
+**ACI:** ACI-PE-004C (supersedes partial PE-004 App Runner attempt)  
 **Date:** 2026-06-22  
-**Status:** **PARTIAL** — ECR and image mirror complete; App Runner stack blocked by IAM and service subscription
+**Status:** **COMPLETE** — EC2 broke-mode PE live
 
 ---
 
 ## Executive Summary
 
-ACI-PE-004 executed the first real AWS resource creation for TSP PE. Terraform plan matched expectations (6 to add). Staged ECR apply and Docker Hub → ECR mirror succeeded. Full `terraform apply` **failed** on IAM role creation (`iam:CreateRole` denied) and App Runner auto-scaling (`SubscriptionRequiredException`). Only **1 of 6** planned resources exists in Terraform state.
-
-**Next step:** Resolve AWS permissions and App Runner account subscription, then re-run `terraform apply`.
+TSP Production Environment is deployed on **EC2 t3.micro** via Terraform (`compute_platform = "ec2"`). App Runner path was abandoned after account/IAM blockers (PE-004/004A); EC2 + Docker Hub pivot approved in PE-004B. Terraform apply added security group and instance; **health check and full smoke test passed** against public URL `http://32.197.194.117`.
 
 ---
 
 ## 1. AWS Identity Confirmation
 
-**Profile:** `nebula` (operator-provided; not committed)
+**Profile:** `nebula` (not committed)
 
 | Field | Value |
 |-------|-------|
 | Account | `526123657916` |
 | Arn | `arn:aws:iam::526123657916:user/nebula` |
 | UserId | `AIDAXU73J5K6MACIMBRO2` |
+| Region | `us-east-1` |
 
-Access keys and secret values were **not** recorded or committed.
-
----
-
-## 2. Terraform Variables
-
-Created from `terraform.tfvars.example` → `terraform/terraform.tfvars` (gitignored).
-
-| Variable | Value |
-|----------|-------|
-| `aws_region` | `us-east-1` |
-| `service_name` | `tsp-production` |
-| `docker_hub_image` | `taig2k/taig_service_portal_tsp` |
-| `docker_image_tag` | `deployable` |
-| `application_port` | `3000` |
-| `environment` | `production` |
+Secrets were not printed or committed.
 
 ---
 
-## 3. Terraform Plan Result
+## 2. Architecture Path
+
+| Aspect | Value |
+|--------|-------|
+| Compute | EC2 **t3.micro** (x86_64) |
+| AMI | Amazon Linux 2023 (SSM parameter) |
+| Container | Docker via `user_data` |
+| Image source | **Docker Hub** `taig2k/taig_service_portal_tsp:deployable` |
+| Ingress | SG TCP 80 → container 3000 |
+| SSH | None |
+| IAM roles | None created |
+| App Runner | Not created |
+
+Prior ECR repository (`taig-service-portal-tsp`) retained in state from PE-004; not used by EC2 runtime.
+
+---
+
+## 3. Terraform State — Before Apply (ACI-PE-004C)
+
+```
+aws_ecr_repository.tsp
+```
+
+ECR state preserved as required.
+
+---
+
+## 4. Terraform Plan Result (ACI-PE-004C)
 
 **Command:** `terraform plan -var-file=terraform.tfvars`
 
 | Metric | Result |
 |--------|--------|
-| Plan | **6 to add, 0 to change, 0 to destroy** |
-| Match to baseline | **Yes** |
+| Plan | **2 to add, 0 to change, 0 to destroy** |
+| Unexpected resources | **None** (no App Runner, IAM, LB, NAT, RDS) |
 
-Planned resources:
+Resources planned:
 
-1. `aws_ecr_repository.tsp`
-2. `aws_iam_role.apprunner_access`
-3. `aws_iam_role_policy_attachment.apprunner_access_ecr`
-4. `aws_iam_role.apprunner_instance`
-5. `aws_apprunner_auto_scaling_configuration_version.tsp`
-6. `aws_apprunner_service.tsp`
-
-Plan output saved locally as `terraform/plan-output-pe004.txt` (gitignored).
+1. `aws_security_group.tsp_ec2[0]`
+2. `aws_instance.tsp[0]`
 
 ---
 
-## 4. Staged Apply — ECR
-
-**Command:** `terraform apply -target=aws_ecr_repository.tsp -var-file=terraform.tfvars -auto-approve`
-
-| Result | Detail |
-|--------|--------|
-| Status | **Success** |
-| Resources added | 1 |
-| Repository name | `taig-service-portal-tsp` |
-| Repository URL | `526123657916.dkr.ecr.us-east-1.amazonaws.com/taig-service-portal-tsp` |
-| ARN | `arn:aws:ecr:us-east-1:526123657916:repository/taig-service-portal-tsp` |
-
----
-
-## 5. ECR Image Mirror
-
-**Script:** `scripts/mirror-image-to-ecr.ps1`
-
-| Field | Value |
-|-------|-------|
-| Source | `taig2k/taig_service_portal_tsp:deployable` |
-| Target | `526123657916.dkr.ecr.us-east-1.amazonaws.com/taig-service-portal-tsp:deployable` |
-| Mirror status | **Success** |
-| Digest | `sha256:936c01ab146dfa86b2f95e0e4b54878eab667297e00526c25813a953f64b5dd0` |
-| Pushed at | `2026-06-22T23:32:08-04:00` |
-
-**Validation:** `aws ecr describe-images --image-ids imageTag=deployable` confirmed tag and digest in ECR.
-
----
-
-## 6. Full Terraform Apply Result
+## 5. Terraform Apply Result
 
 **Command:** `terraform apply -var-file=terraform.tfvars -auto-approve`
 
-| Result | Detail |
+| Metric | Result |
 |--------|--------|
-| Status | **Failed** (partial) |
-| Resources in state after apply | 1 (`aws_ecr_repository.tsp` only) |
-
-### Errors
-
-**IAM — `aws_iam_role.apprunner_access` and `aws_iam_role.apprunner_instance`**
-
-```
-AccessDenied: User arn:aws:iam::526123657916:user/nebula is not authorized to perform: iam:CreateRole
-```
-
-**App Runner — `aws_apprunner_auto_scaling_configuration_version.tsp`**
-
-```
-SubscriptionRequiredException: The AWS Access Key Id needs a subscription for the service
-```
-
-### Remediation required
-
-1. Grant the deploy principal (`nebula` or a dedicated Terraform role) permissions including:
-   - `iam:CreateRole`, `iam:AttachRolePolicy`, `iam:PassRole`, `iam:GetRole`, `iam:TagRole`
-   - `apprunner:*` (or scoped App Runner create/manage actions)
-2. Ensure **AWS App Runner** is enabled/subscribed for account `526123657916` (first-time use may require console opt-in or account activation).
-3. Re-run: `terraform apply -var-file=terraform.tfvars`
-
-No manual AWS resource creation was performed outside Terraform except the documented mirror script (Docker pull/tag/push to existing ECR repo).
+| Outcome | **Success** |
+| Added | 2 |
+| Changed | 0 |
+| Destroyed | 0 |
 
 ---
 
-## 7. Resources Created
+## 6. Resources Created
 
-| Resource | Status |
-|----------|--------|
-| ECR repository `taig-service-portal-tsp` | **Created** |
-| ECR image `deployable` | **Present** |
-| IAM role `tsp-production-apprunner-access` | **Not created** |
-| IAM policy attachment (ECR access) | **Not created** |
-| IAM role `tsp-production-apprunner-instance` | **Not created** |
-| App Runner auto scaling `tsp-production-autoscaling` | **Not created** |
-| App Runner service `tsp-production` | **Not created** |
+| Resource | Identifier |
+|----------|------------|
+| Security group | `sg-01ae803e7f43f286e` (`tsp-production-ec2`) |
+| EC2 instance | `i-04db848abd1bd57f7` (`tsp-production`, t3.micro) |
+| ECR repository | `taig-service-portal-tsp` (pre-existing, unchanged) |
+
+**Not created:** App Runner, IAM roles, Elastic IP, key pair, load balancer.
 
 ---
 
-## 8. Terraform Outputs (current state)
+## 7. Terraform Outputs
 
-```
-docker_hub_source_image = "taig2k/taig_service_portal_tsp:deployable"
-ecr_repository_arn      = "arn:aws:ecr:us-east-1:526123657916:repository/taig-service-portal-tsp"
-ecr_repository_url      = "526123657916.dkr.ecr.us-east-1.amazonaws.com/taig-service-portal-tsp"
-planned_image           = "526123657916.dkr.ecr.us-east-1.amazonaws.com/taig-service-portal-tsp:deployable"
-planned_region          = "us-east-1"
-planned_service_name    = "tsp-production"
-```
+| Output | Value |
+|--------|-------|
+| `future_service_url` | `http://32.197.194.117:80` |
+| `ec2_public_ip` | `32.197.194.117` |
+| `ec2_instance_id` | `i-04db848abd1bd57f7` |
+| `compute_platform` | `ec2` |
+| `ec2_container_image` | `taig2k/taig_service_portal_tsp:deployable` |
+| `planned_region` | `us-east-1` |
+| `planned_service_name` | `tsp-production` |
+| `ecr_repository_url` | `526123657916.dkr.ecr.us-east-1.amazonaws.com/taig-service-portal-tsp` |
 
-App Runner URL and service ARN outputs are **not available** until full apply succeeds.
-
----
-
-## 9. Cost Notes
-
-| Component | Estimate | Current billing impact |
-|-----------|----------|------------------------|
-| ECR storage | ~$0.10/GB-month | Minimal (single small image) |
-| ECR data transfer | Low for mirror | One-time push completed |
-| App Runner | ~$7–$15/month (256 CPU / 512 MB, 1–2 instances) | **$0** — service not created |
-| IAM | No charge | N/A |
-
-**Current monthly run rate:** ECR-only (~under $1 until App Runner is deployed).
+Security group ID (from apply): `sg-01ae803e7f43f286e`
 
 ---
 
-## 10. Risks
+## 8. Initial Availability Check
 
-| Risk | Severity | Notes |
-|------|----------|-------|
-| Deploy principal lacks IAM permissions | **High** | Blocks App Runner stack |
-| App Runner not subscribed on account | **High** | `SubscriptionRequiredException` |
-| Partial state (ECR only) | Medium | Safe to re-apply; no orphan App Runner resources |
-| Local Terraform state | Medium | Backup `terraform.tfstate` before next apply |
-| Public App Runner URL (when created) | Low | Expected for MVP; no custom domain yet |
+| Check | Result |
+|-------|--------|
+| `GET http://32.197.194.117/health` | **HTTP 200** — `{"status":"ok"}` (~50s after apply, cloud-init + Docker pull) |
+| `node scripts/smoke-test.js http://32.197.194.117` | **6/6 PASS** (health, home, about, services, contact) |
+| EC2 instance state | `running` |
 
 ---
 
-## 11. Readiness for ACI-PE-005
+## 9. PE History (Context)
 
-**Not ready.** PE validation (smoke tests against live App Runner URL) requires:
-
-1. IAM permissions fix for Terraform deploy principal
-2. App Runner service subscription/activation on the account
-3. Successful full `terraform apply`
-4. Captured `apprunner_service_url` output and smoke test pass
+| ACI | Outcome |
+|-----|---------|
+| PE-004 | ECR + image mirror; App Runner apply failed (IAM + subscription) |
+| PE-004A | Blockers documented; admin actions for App Runner path |
+| PE-004B | Pivot to EC2 assessed and approved |
+| **PE-004C** | **EC2 PE created and smoke-validated** |
 
 ---
 
-## 12. Secrets and Git Hygiene
+## 10. Cost Notes
 
-The following were **not** committed:
+| Component | Estimate |
+|-----------|----------|
+| t3.micro on-demand | ~$7.50/month (~$0.0104/hr) |
+| 8 GB gp3 EBS | ~$0.64/month |
+| ECR storage | ~<$1/month (optional, existing) |
+| **One-day PE test** | ~$0.25–0.35 compute + pennies EBS |
+| Free tier | t3.micro may be covered (750 hrs/mo, 12 mo, new accounts) |
 
-- `terraform/terraform.tfvars`
-- `terraform/terraform.tfstate`
-- `terraform/.terraform/`
-- AWS credentials
-- `terraform/plan-output-pe004.txt`
+No App Runner, NAT, or load balancer charges.
+
+---
+
+## 11. Risks
+
+| Risk | Notes |
+|------|-------|
+| Ephemeral public IP | Changes on instance replace; no Elastic IP |
+| HTTP only (port 80) | No TLS/custom domain |
+| SG open to 0.0.0.0/0:80 | MVP PE acceptable; tighten for long-term |
+| No SSH/SSM | Debug via console/cloud-init logs only |
+| Docker Hub dependency | EC2 pulls public image at boot |
+| Single instance | No HA |
+
+---
+
+## 12. Readiness For ACI-PE-005
+
+**Ready.** Live PE URL available for formal PE validation:
+
+- URL: `http://32.197.194.117`
+- Smoke test baseline: 6/6 pass
+- Recommended: full PE validation report, uptime monitoring, teardown plan
+
+---
+
+## 13. Secrets and Git Hygiene
+
+Not committed: `terraform.tfvars`, `terraform.tfstate`, `.terraform/`, credentials, plan output files.

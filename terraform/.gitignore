@@ -10,6 +10,7 @@ plan-output-pe003.txt
 plan-output-pe004.txt
 plan-output-pe004a.txt
 plan-output-pe004b.txt
+plan-output-pe004c.txt
 crash.log
 crash.*.log
 override.tf
