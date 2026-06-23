@@ -80,7 +80,7 @@ Infrastructure definition is sound. Apply is authorized only after:
 
 ## 9. Commit ID(s)
 
-_To be updated after push._
+| `c903c82` (`c903c82fe9f40d589ac8d614c6fa7d9f4fe49a72`) | ACI-PE-002 plan review |
 
 ---
 
