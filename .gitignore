@@ -14,3 +14,10 @@ terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/terraform.tfvars
+
+# Nebula local preservation (never commit)
+nebula_local/
+.nebula/
+aiw/
+aiw_local/
+*.local.md
