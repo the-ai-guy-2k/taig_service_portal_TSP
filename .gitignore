@@ -8,3 +8,9 @@ dist/
 Thumbs.db
 coverage/
 .nyc_output/
+
+# Terraform (see terraform/.gitignore)
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars

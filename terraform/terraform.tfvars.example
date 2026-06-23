@@ -1,0 +1,37 @@
+# TSP Production Environment — example variable values
+# Copy to terraform.tfvars and adjust before terraform plan/apply.
+# Do NOT commit terraform.tfvars (contains environment-specific values).
+
+aws_region       = "us-east-1"
+environment      = "production"
+service_name     = "tsp-production"
+
+docker_image     = "taig2k/taig_service_portal_tsp"
+docker_image_tag = "deployable"
+
+# App Runner supports ECR and ECR_PUBLIC natively. Mirror the Docker Hub image
+# to ECR before apply, then set docker_image to the ECR repository URI.
+image_repository_type = "ECR"
+
+application_port = 3000
+
+auto_deployments_enabled = false
+
+cpu    = "256"
+memory = "512"
+
+max_concurrency = 100
+min_size        = 1
+max_size        = 3
+
+health_check_path                = "/health"
+health_check_interval            = 10
+health_check_timeout             = 5
+health_check_healthy_threshold   = 1
+health_check_unhealthy_threshold = 3
+
+runtime_environment_variables = {}
+
+tags = {
+  ACI = "PE-001"
+}
