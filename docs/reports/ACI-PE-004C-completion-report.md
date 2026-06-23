@@ -111,7 +111,7 @@ planned_service_name  = tsp-production
 
 ## 12. Commit ID(s)
 
-_To be recorded after documentation commit._
+`7895d91` — ACI-PE-004C: Document EC2 PE creation and live smoke-validated URL.
 
 ---
 
