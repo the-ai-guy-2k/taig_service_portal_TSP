@@ -93,7 +93,7 @@ See [PAPEV_passdown.md](PAPEV_passdown.md): optional HTTPS/domain, remote state,
 
 ## 8. Commit ID(s)
 
-_To be recorded after documentation commit._
+`eda11e3` — ACI-PE-006: PAPEV certification — TSP certified, PE build mission closed.
 
 ---
 
