@@ -135,7 +135,7 @@ Then ACI-PE-005 (PE validation) can proceed.
 
 ## 12. Commit ID(s)
 
-_To be recorded after documentation commit._
+`9e91586` — ACI-PE-004: Document partial PE creation (ECR complete, App Runner blocked).
 
 ---
 
