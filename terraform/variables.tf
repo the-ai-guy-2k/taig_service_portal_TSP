@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_skip_credential_checks" {
+  description = "Skip AWS credential validation for offline plan review only. Must be false for terraform apply."
+  type        = bool
+  default     = false
+}
+
 variable "environment" {
   description = "Deployment environment name (e.g. production)."
   type        = string

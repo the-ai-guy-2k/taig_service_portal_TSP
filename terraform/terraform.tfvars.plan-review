@@ -1,0 +1,36 @@
+# Plan review variables (ACI-PE-002) — offline plan generation only.
+# Do NOT use for terraform apply. Use terraform.tfvars with real AWS credentials for apply.
+
+aws_skip_credential_checks = true
+
+aws_region       = "us-east-1"
+environment      = "production"
+service_name     = "tsp-production"
+
+docker_image     = "taig2k/taig_service_portal_tsp"
+docker_image_tag = "deployable"
+
+image_repository_type = "ECR"
+
+application_port = 3000
+
+auto_deployments_enabled = false
+
+cpu    = "256"
+memory = "512"
+
+max_concurrency = 100
+min_size        = 1
+max_size        = 3
+
+health_check_path                = "/health"
+health_check_interval            = 10
+health_check_timeout             = 5
+health_check_healthy_threshold   = 1
+health_check_unhealthy_threshold = 3
+
+runtime_environment_variables = {}
+
+tags = {
+  ACI = "PE-002"
+}

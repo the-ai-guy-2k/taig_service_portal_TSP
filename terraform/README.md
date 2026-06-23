@@ -102,6 +102,17 @@ terraform plan
 
 `terraform plan` shows resources that **would** be created. Review output in ACI-PE-002 before applying.
 
+### Plan review (ACI-PE-002)
+
+```bash
+cd terraform
+terraform plan -var-file=terraform.tfvars.plan-review
+```
+
+See [PE_plan_review.md](../docs/reports/PE_plan_review.md) for full assessment.
+
+`terraform.tfvars.plan-review` enables offline structural plan review (`aws_skip_credential_checks = true`). **Do not use for apply.** Before apply, mirror the Docker Hub image to ECR and run plan with real credentials using `terraform.tfvars` (`aws_skip_credential_checks = false`).
+
 ### Validation only (no AWS credentials required)
 
 ```bash
