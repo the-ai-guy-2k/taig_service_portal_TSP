@@ -670,3 +670,14 @@ p + p {
     padding-top: 2rem;
   }
 }
+
+/* TSP rebuild (Nov 2026): Duval-style structure, TAIG colors */
+:root { --color-teal: #0f766e; --color-gold: #d97706; --color-cream: #faf7f0; }
+.section-cream { background: var(--color-cream); }
+.code-label { font-family: ui-monospace, monospace; color: var(--color-teal); font-size: 0.9rem; letter-spacing: 0.02em; }
+.service-strip { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+.service-strip span { border: 1px solid rgba(255,255,255,0.4); border-radius: 999px; padding: 0.25rem 0.75rem; font-size: 0.9rem; }
+.status-bar { font-family: ui-monospace, monospace; color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+.steps-list li { margin-bottom: 0.75rem; }
+.form-success { background: #ecfdf5; border: 1px solid #6ee7b7; padding: 0.75rem 1rem; border-radius: var(--radius); }
+.form-error { background: #fef2f2; border: 1px solid #fca5a5; padding: 0.75rem 1rem; border-radius: var(--radius); }

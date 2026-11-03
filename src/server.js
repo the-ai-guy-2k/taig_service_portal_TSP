@@ -1,7 +1,20 @@
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
 
+const submissionsFile = path.join(__dirname, '..', 'data', 'submissions.json');
+function loadSubmissions() {
+  try { const raw = fs.readFileSync(submissionsFile, 'utf8'); const v = JSON.parse(raw); return Array.isArray(v) ? v : []; } catch { return []; }
+}
+function saveSubmission(entry) {
+  const dir = path.dirname(submissionsFile);
+  fs.mkdirSync(dir, { recursive: true });
+  const all = loadSubmissions(); all.push(entry);
+  fs.writeFileSync(submissionsFile, JSON.stringify(all, null, 2) + '\n', 'utf8');
+}
+
 const app = express();
+app.use(express.urlencoded({ extended: false }));
 const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
@@ -51,7 +64,33 @@ app.get('/services', (_req, res) => {
 });
 
 app.get('/contact', (_req, res) => {
-  res.render('contact', pageMeta.contact);
+  res.render('contact', { ...pageMeta.contact, success: false, error: null, form: {} });
+});
+
+app.post('/contact', (req, res) => {
+  const form = {
+    name: (req.body.name || '').trim(),
+    email: (req.body.email || '').trim(),
+    phone: (req.body.phone || '').trim(),
+    company: (req.body.company || '').trim(),
+    subject: (req.body.subject || '').trim(),
+    message: (req.body.message || '').trim(),
+    timeline: (req.body.timeline || '').trim(),
+    budget: (req.body.budget || '').trim(),
+    smsConsent: req.body.smsConsent === 'on',
+  };
+  if (!form.name || !form.email || !form.phone) {
+    return res.status(400).render('contact', { ...pageMeta.contact, success: false, error: 'Please fill in your full name, email, and phone.', form });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    return res.status(400).render('contact', { ...pageMeta.contact, success: false, error: 'That email address does not look right — please check it and try again.', form });
+  }
+  try {
+    saveSubmission({ submittedAt: new Date().toISOString(), ...form });
+  } catch (err) {
+    return res.status(500).render('contact', { ...pageMeta.contact, success: false, error: 'Your message could not be saved right now — please email taig2k@outlook.com directly.', form });
+  }
+  return res.render('contact', { ...pageMeta.contact, success: true, error: null, form: {} });
 });
 
 app.use(express.static(path.join(__dirname, 'public')));

@@ -21,3 +21,6 @@ nebula_local/
 aiw/
 aiw_local/
 *.local.md
+
+# Contact form submissions (operator file, never commit)
+data/

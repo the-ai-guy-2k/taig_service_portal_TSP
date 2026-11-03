@@ -14,7 +14,7 @@ const checks = [
   { path: '/', contains: 'Technology that starts with your business problem', label: 'Home page' },
   { path: '/', contains: 'Nebula', label: 'Home Nebula section' },
   { path: '/about', contains: 'Start With The Problem', label: 'About page' },
-  { path: '/services', contains: 'IT Support', label: 'Services page' },
+  { path: '/services', contains: 'Monthly Run', label: 'Services page' },
   { path: '/contact', contains: 'Send a Message', label: 'Contact page' },
 ];
 

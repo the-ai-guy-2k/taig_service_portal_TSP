@@ -24,7 +24,15 @@
             <ul class="contact-details">
               <li>
                 <span class="contact-label">Email</span>
-                <a href="mailto:contact@theaiguy.com">contact@theaiguy.com</a>
+                <a href="mailto:taig2k@outlook.com">taig2k@outlook.com</a>
+              </li>
+              <li>
+                <span class="contact-label">Phone</span>
+                <a href="tel:+19049161460">(904) 916-1460</a>
+              </li>
+              <li>
+                <span class="contact-label">Based in</span>
+                <span>Jacksonville, FL</span>
               </li>
               <li>
                 <span class="contact-label">Response Time</span>
@@ -43,37 +51,67 @@
 
           <div class="contact-form-wrapper">
             <h2>Send a Message</h2>
-            <form class="contact-form" action="#" method="post" novalidate>
+            <% if (typeof success !== 'undefined' && success) { %>
+              <p class="form-success" role="status">Thanks — your message was received. We will get back to you within one business day.</p>
+            <% } %>
+            <% if (typeof error !== 'undefined' && error) { %>
+              <p class="form-error" role="alert"><%= error %></p>
+            <% } %>
+            <form class="contact-form" action="/contact" method="post">
               <div class="form-group">
-                <label for="name">Name <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="name" name="name" required autocomplete="name" placeholder="Your name" />
+                <label for="name">Full Name <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="name" name="name" required autocomplete="name" placeholder="Your full name" value="<%= typeof form !== 'undefined' && form.name ? form.name : '' %>" />
               </div>
               <div class="form-group">
                 <label for="email">Email <span class="required" aria-hidden="true">*</span></label>
-                <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@company.com" />
+                <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@company.com" value="<%= typeof form !== 'undefined' && form.email ? form.email : '' %>" />
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone <span class="required" aria-hidden="true">*</span></label>
+                <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="(904) 555-0100" value="<%= typeof form !== 'undefined' && form.phone ? form.phone : '' %>" />
               </div>
               <div class="form-group">
                 <label for="company">Company</label>
-                <input type="text" id="company" name="company" autocomplete="organization" placeholder="Your organization (optional)" />
+                <input type="text" id="company" name="company" autocomplete="organization" placeholder="Your organization (optional)" value="<%= typeof form !== 'undefined' && form.company ? form.company : '' %>" />
               </div>
               <div class="form-group">
-                <label for="subject">Subject <span class="required" aria-hidden="true">*</span></label>
-                <select id="subject" name="subject" required>
+                <label for="subject">Subject</label>
+                <select id="subject" name="subject">
                   <option value="">Select a topic</option>
-                  <option value="it-support">IT Support</option>
-                  <option value="consulting">Technology Consulting</option>
-                  <option value="assessment">Operational Assessment</option>
-                  <option value="discovery">Problem Discovery</option>
-                  <option value="advisory">Business Advisory</option>
+                  <option value="audit">Audit</option>
+                  <option value="rebuild">Rebuild</option>
+                  <option value="monthly-run">Monthly Run</option>
+                  <option value="streamwatch">StreamWatch</option>
+                  <option value="home-automation">Home Automation</option>
                   <option value="general">General Inquiry</option>
                 </select>
               </div>
               <div class="form-group">
-                <label for="message">Message <span class="required" aria-hidden="true">*</span></label>
-                <textarea id="message" name="message" rows="5" required placeholder="Tell us about your situation or question..."></textarea>
+                <label for="message">Project Background</label>
+                <textarea id="message" name="message" rows="5" placeholder="Tell us about your situation or question... (optional)"><%= typeof form !== 'undefined' && form.message ? form.message : '' %></textarea>
               </div>
-              <p class="form-disclaimer">Form submission is not yet active. This is a preview of the contact experience.</p>
-              <button type="submit" class="btn btn-primary btn-full" disabled>Send Message</button>
+              <div class="form-group">
+                <label for="timeline">Timeline (optional)</label>
+                <select id="timeline" name="timeline">
+                  <option value="">Just exploring</option>
+                  <option value="this-month">This month</option>
+                  <option value="next-few-months">Next few months</option>
+                  <option value="flexible">Flexible</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="budget">Rough Budget (optional)</label>
+                <select id="budget" name="budget">
+                  <option value="">Prefer to discuss</option>
+                  <option value="under-500">Under $500</option>
+                  <option value="500-2000">$500 - $2,000</option>
+                  <option value="over-2000">Over $2,000</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label><input type="checkbox" name="smsConsent" /> It is OK to text me about this inquiry.</label>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">Send Message</button>
             </form>
           </div>
         </div>

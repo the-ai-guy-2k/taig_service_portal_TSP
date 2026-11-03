@@ -16,6 +16,10 @@ TSP is the central web platform for The AI Guy (TAIG). It presents TAIG services
 
 **MVP includes:** Home, About, Services, Contact pages; shared navigation and branding; Nebula overview; contact form UI (no backend).
 
+## Rebuild (Nov 2026)
+
+Structure modelled on a simple, single-column service site (hero + service strip, capabilities, proof-style sections, final call to action), with original TAIG copy throughout. Contact form now stores submissions: POST /contact validates full name, email, and phone, appends the submission to `data/submissions.json` (gitignored, never committed), and shows a success message. There is no public admin page — the operator reads submissions via server SSH. No database, auth system, ticketing, or billing was added; those remain out of scope.
+
 ## MVP Scope (Delivered)
 
 - Public-facing landing and informational pages
