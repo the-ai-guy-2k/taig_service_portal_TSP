@@ -1,15 +1,16 @@
 /* TAIG Service Portal — MVP styles */
 
 :root {
-  --color-primary: #1e3a5f;
-  --color-primary-dark: #152a45;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f1f5f9;
-  --color-text: #0f172a;
-  --color-text-muted: #475569;
-  --color-border: #e2e8f0;
+  --color-primary: #182941;
+  --color-primary-dark: #0e1a29;
+  --color-accent: #CDA140;
+  --color-accent-hover: #a98530;
+  --color-gold-dark: #8a6d1f;
+  --color-surface: #F5F1E8;
+  --color-surface-alt: #ece4d0;
+  --color-text: #182941;
+  --color-text-muted: #5c5a50;
+  --color-border: #ddd2b8;
   --color-nebula: #4f46e5;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --radius: 8px;
@@ -45,7 +46,7 @@ img {
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--color-primary);
   text-decoration: none;
 }
 
@@ -97,7 +98,9 @@ p + p {
 
 .brand {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.65rem;
   text-decoration: none;
   color: inherit;
 }
@@ -106,18 +109,35 @@ p + p {
   text-decoration: none;
 }
 
+.brand-logo {
+  height: 46px;
+  width: auto;
+  display: block;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
 .brand-mark {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0;
   color: var(--color-primary);
 }
 
+.brand-ai {
+  color: var(--color-accent);
+}
+
 .brand-tagline {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  letter-spacing: 0.02em;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  letter-spacing: 0.18em;
 }
 
 .site-nav {
@@ -194,7 +214,7 @@ p + p {
 
 /* Hero */
 .hero {
-  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 55%, #0f172a 100%);
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 55%, #0e1a29 100%);
   color: #fff;
   padding: 4.5rem 0 5rem;
 }
@@ -214,7 +234,7 @@ p + p {
 }
 
 .page-hero .eyebrow {
-  color: var(--color-accent);
+  color: var(--color-gold-dark);
 }
 
 .hero h1 {
@@ -273,15 +293,15 @@ p + p {
 }
 
 .btn-primary {
-  background: var(--color-accent);
-  color: #fff;
-  border-color: var(--color-accent);
+  background: var(--color-primary);
+  color: #F5F1E8;
+  border-color: var(--color-primary);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-  color: #fff;
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: #F5F1E8;
 }
 
 .btn-secondary {
@@ -533,7 +553,7 @@ p + p {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(205, 161, 64, 0.25);
 }
 
 .form-group textarea {
@@ -561,9 +581,21 @@ p + p {
   padding: 3rem 1.25rem 2rem;
 }
 
+.footer-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.footer-logo {
+  height: 34px;
+  width: auto;
+  display: block;
+}
+
 .footer-brand .brand-mark {
-  color: #fff;
-  font-size: 1.25rem;
+  color: #F5F1E8;
+  font-size: 1.15rem;
 }
 
 .footer-tagline {
@@ -671,8 +703,8 @@ p + p {
   }
 }
 
-/* TSP rebuild (Nov 2026): Duval-style structure, TAIG colors */
-:root { --color-teal: #0f766e; --color-gold: #d97706; --color-cream: #faf7f0; }
+/* TSP rebrand (Nov 2026): tAIg cream/navy/gold */
+:root { --color-teal: #8a6d1f; --color-gold: #CDA140; --color-cream: #ece4d0; }
 .section-cream { background: var(--color-cream); }
 .code-label { font-family: ui-monospace, monospace; color: var(--color-teal); font-size: 0.9rem; letter-spacing: 0.02em; }
 .service-strip { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 260 720 830">
+  <title>TAIG badge</title>
+  <!-- Badge: pointy-top hexagon, navy fill, gold outline (from the approved tAIg logo) -->
+  <polygon points="430,295 759,485 759,865 430,1055 101,865 101,485" fill="#182941" stroke="#CDA140" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="430,335 724,505 724,845 430,1015 136,845 136,505" fill="none" stroke="#CDA140" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Network mark: outer triangle + inner triangle + nodes -->
+  <g stroke="#CDA140" stroke-width="8" stroke-linejoin="round" fill="none">
+    <polygon points="430,480 280,850 580,850"/>
+    <polygon points="430,640 370,750 490,750" stroke-width="6"/>
+  </g>
+  <g fill="#182941" stroke="#CDA140" stroke-width="8">
+    <circle cx="430" cy="480" r="26"/>
+    <circle cx="280" cy="850" r="26"/>
+    <circle cx="580" cy="850" r="26"/>
+  </g>
+  <g fill="#182941" stroke="#CDA140" stroke-width="6">
+    <circle cx="430" cy="640" r="16"/>
+    <circle cx="370" cy="750" r="16"/>
+    <circle cx="490" cy="750" r="16"/>
+  </g>
+  <circle cx="430" cy="735" r="10" fill="#CDA140"/>
+</svg>
