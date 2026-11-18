@@ -11,7 +11,7 @@
   --color-text: #182941;
   --color-text-muted: #5c5a50;
   --color-border: #ddd2b8;
-  --color-nebula: #4f46e5;
+  --color-nebula: #CDA140;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --radius: 8px;
   --radius-lg: 12px;
@@ -409,7 +409,7 @@ p + p {
 }
 
 .nebula-section .eyebrow {
-  color: var(--color-nebula);
+  color: var(--color-gold-dark);
 }
 
 .text-link {
